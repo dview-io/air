@@ -24,7 +24,7 @@ public class AirQuerySubmitter {
 
   /**
    * @param query linked with {@link String}
-   * @return Map linked with {@link Map}
+   * @return List linked with {@link List}
    * @throws SQLException linked with {@link Exception}
    */
   public List<Object> executeQuery(final String query) throws SQLException, JsonProcessingException {

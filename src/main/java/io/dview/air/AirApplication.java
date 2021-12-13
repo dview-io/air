@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import static io.dview.air.Constants.OBJECT_MAPPER;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -37,7 +36,7 @@ public class AirApplication {
 
     /**
      * @param query linked with {@link String}
-     * @return Map  linked with {@link Map}
+     * @return List  linked with {@link List}
      * @throws SQLException linked with {@link Exception}
      */
     public List<Object> submitQuery(String query) throws SQLException, JsonProcessingException {
