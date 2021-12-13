@@ -1,0 +1,4 @@
+endPoint: 'jdbc:pinot://localhost:9000'
+authToken:
+poolSize: 10
+query: "select * from airlineStats"
