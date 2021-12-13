@@ -10,6 +10,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
  *
  */
 public class Constants {
+    private Constants(){ throw new IllegalStateException("Utils Can't Be Initialised");}
     public static final ObjectMapper OBJECT_MAPPER =new ObjectMapper(new YAMLFactory())
             .setSerializationInclusion(JsonInclude.Include.NON_NULL)
             .setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
