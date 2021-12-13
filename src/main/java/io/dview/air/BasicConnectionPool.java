@@ -27,13 +27,10 @@ public class BasicConnectionPool implements ConnectionPool {
     this.connectionPool = pool;
   }
 
-  public static BasicConnectionPool create(String endPoint, String authToken, int poolSize)
-      throws SQLException {
+  public static BasicConnectionPool create(String endPoint, String authToken, int poolSize) throws SQLException {
     DriverManager.registerDriver(new PinotDriver());
     LinkedList<Connection> pool = new LinkedList<>();
-    for (int i = 0; i < poolSize; i++) {
-      pool.add(createConnection(endPoint, authToken));
-    }
+    for (int i = 0; i < poolSize; i++) { pool.add(createConnection(endPoint, authToken)); }
     return new BasicConnectionPool(endPoint, authToken, pool);
   }
 
@@ -43,8 +40,7 @@ public class BasicConnectionPool implements ConnectionPool {
    * @return Connection linked with {@link Connection}
    * @throws SQLException linked with {@link Exception}
    */
-  private static Connection createConnection(String endPoint, String authToken)
-      throws SQLException {
+  private static Connection createConnection(String endPoint, String authToken) throws SQLException {
     if (authToken != null) {
       Properties pinotProperties = new Properties();
       pinotProperties.put(Constants.HEADER_NAME, Constants.HEADER_VALUE);
@@ -59,12 +55,15 @@ public class BasicConnectionPool implements ConnectionPool {
   public synchronized Connection getConnection() throws SQLException {
     if (this.connectionPool.isEmpty() && usedConnections.isEmpty()) {
       connectionPool.add(createConnection(this.endPoint, this.authToken));
+      log.info("New Connection On Empty Check, Size {}, {}", this.connectionPool.size(), this.usedConnections.size());
     } else if (this.connectionPool.isEmpty()) {
       while (this.connectionPool.size() - 1 < 0) {
         try {
           wait();
         } catch (InterruptedException ex) {
           log.error("Failed due to : {}", Throwables.getStackTraceAsString(ex.fillInStackTrace()));
+          connectionPool.add(createConnection(this.endPoint, this.authToken));
+          log.info("New Connection Is Added, Size {}, {}", this.connectionPool.size(), this.usedConnections.size());
         }
       }
     }
@@ -74,6 +73,7 @@ public class BasicConnectionPool implements ConnectionPool {
     if (connection.isClosed()) {
       connection = createConnection(this.endPoint, this.authToken);
       connectionPool.add(connection);
+      log.info("New Connection On Closed Check, Size {}, {}", this.connectionPool.size(), this.usedConnections.size());
     }
     usedConnections.addLast(connection);
     return connection;
@@ -85,8 +85,14 @@ public class BasicConnectionPool implements ConnectionPool {
    */
   @Override
   public synchronized boolean releaseConnection(Connection connection) throws SQLException {
-    if (connection.isClosed()) { connection = createConnection(this.endPoint, this.authToken); }
+    if (connection.isClosed()) {
+      connection = createConnection(this.endPoint, this.authToken);
+      log.info("New Connection On Closed Check, Size {}, {}", this.connectionPool.size(), this.usedConnections.size());
+    }
     this.connectionPool.addLast(connection);
-    return Objects.nonNull(usedConnections.removeFirst());
+    if (!usedConnections.isEmpty()) {
+      usedConnections.removeFirst();
+    }
+    return true;
   }
 }

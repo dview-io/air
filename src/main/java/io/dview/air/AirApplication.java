@@ -3,7 +3,7 @@ package io.dview.air;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import static io.dview.air.Constants.OBJECT_MAPPER;
@@ -40,7 +40,7 @@ public class AirApplication {
      * @return Map  linked with {@link Map}
      * @throws SQLException linked with {@link Exception}
      */
-    public LinkedList<Object> submitQuery(String query) throws SQLException, JsonProcessingException {
+    public List<Object> submitQuery(String query) throws SQLException, JsonProcessingException {
         return this.airQuerySubmitter.executeQuery(query);
     }
 }
