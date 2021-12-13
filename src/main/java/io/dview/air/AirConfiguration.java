@@ -15,6 +15,6 @@ import lombok.NoArgsConstructor;
 public class AirConfiguration {
     private String endPoint;
     private String authToken;
-    private int poolSize;
+    private int poolSize = 5;
     private String query;
 }
