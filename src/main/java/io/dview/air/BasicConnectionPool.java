@@ -16,11 +16,15 @@ import java.util.*;
 @Slf4j
 public class BasicConnectionPool implements ConnectionPool {
 
+    private final String endPoint;
+    private final String authToken;
     private final LinkedList<Connection> connectionPool;
     private final LinkedList<Connection> usedConnections = new LinkedList<>();
 
-    public BasicConnectionPool(LinkedList<Connection> pool) {
-        connectionPool = pool;
+    public BasicConnectionPool(String endPoint, String authToken, LinkedList<Connection> pool) {
+        this.endPoint = endPoint;
+        this.authToken = authToken;
+        this.connectionPool = pool;
     }
 
     public static BasicConnectionPool create(String endPoint, String authToken, int poolSize) throws SQLException {
@@ -29,7 +33,7 @@ public class BasicConnectionPool implements ConnectionPool {
         for (int i = 0; i < poolSize; i++) {
             pool.add(createConnection(endPoint, authToken));
         }
-        return new BasicConnectionPool(pool);
+        return new BasicConnectionPool(endPoint, authToken, pool);
     }
 
     /**
@@ -53,9 +57,11 @@ public class BasicConnectionPool implements ConnectionPool {
      * @return Connection linked with {@link Connection}
      */
     @Override
-    public synchronized Connection getConnection() {
-        if (connectionPool.isEmpty()) {
-            while (connectionPool.size() - 1 < 0) {
+    public synchronized Connection getConnection() throws SQLException {
+        if (this.connectionPool.isEmpty() && usedConnections.isEmpty()) {
+            connectionPool.add(createConnection(this.endPoint, this.authToken));
+        } else if (this.connectionPool.isEmpty()) {
+            while (this.connectionPool.size() - 1 < 0) {
                 try {
                     wait();
                 } catch (InterruptedException e) {
@@ -63,7 +69,7 @@ public class BasicConnectionPool implements ConnectionPool {
                 }
             }
         }
-        Connection connection = connectionPool.removeFirst();
+        Connection connection = this.connectionPool.removeFirst();
         usedConnections.addLast(connection);
         return connection;
     }
@@ -74,7 +80,7 @@ public class BasicConnectionPool implements ConnectionPool {
      */
     @Override
     public synchronized boolean releaseConnection(Connection connection) {
-        connectionPool.addLast(connection);
+        this.connectionPool.addLast(connection);
         return Objects.nonNull(usedConnections.removeFirst());
     }
 }
