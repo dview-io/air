@@ -8,4 +8,4 @@ Pinot Connection Polling and Resulting as list of Objects.
 
     - Ussage
         - AirApplication airApplication = new AirApplication(airConfiguration);
-          airApplication.submitQuery(airConfiguration.getQuery());
+          airApplication.submitQuery("select * from airlineStats limit 10");
