@@ -27,19 +27,22 @@ public class AirQuerySubmitter {
    * @return List linked with {@link List}
    * @throws SQLException linked with {@link Exception}
    */
-  public List<Object> executeQuery(final String query) throws SQLException, JsonProcessingException {
+  public List<Map<String, Object>> executeQuery(final String query) throws SQLException, JsonProcessingException {
     Connection pinotConnection = this.basicConnectionPool.getConnection();
     try (Statement statement = pinotConnection.createStatement(); ) {
       ResultSet rs = statement.executeQuery(query);
       int col = rs.getMetaData().getColumnCount();
-      LinkedList<Object> queryResult = new LinkedList<>();
+      LinkedList<Map<String, Object>> queryResult = new LinkedList<>();
       while (rs.next()) {
         Map<String, Object> entry = new HashMap<>();
         for (int i = 1; i <= col; ++i) {
           if (rs.getMetaData().getColumnTypeName(i).contains("ARRAY")) {
             List<Object> objects = OBJECT_MAPPER.readValue(rs.getString(i), new TypeReference<List<Object>>() {});
             entry.put(rs.getMetaData().getColumnLabel(i), objects);
-          } else entry.put(rs.getMetaData().getColumnLabel(i), rs.getObject(i));
+          }else if (rs.getMetaData().getColumnTypeName(i).contains("JSON")){
+            Map<String, Object> objects = OBJECT_MAPPER.readValue(rs.getString(i), new TypeReference<Map<String, Object>>() {});
+            entry.put(rs.getMetaData().getColumnLabel(i), objects);
+          }else entry.put(rs.getMetaData().getColumnLabel(i), rs.getObject(i));
         }
         queryResult.add(entry);
       }
