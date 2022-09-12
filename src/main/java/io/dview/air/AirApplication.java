@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import static io.dview.air.Constants.OBJECT_MAPPER;
+import static io.dview.air.Constants.QUERY_SPLITTER;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
@@ -34,25 +36,21 @@ public class AirApplication {
    * @throws SQLException linked with {@link Exception}
    */
   public static void main(String[] args) throws IOException, SQLException {
-    AirConfiguration airConfiguration =
-        OBJECT_MAPPER.findAndRegisterModules().readValue(new File(args[0]), AirConfiguration.class);
+    AirConfiguration airConfiguration = OBJECT_MAPPER.findAndRegisterModules().readValue(new File(args[0]), AirConfiguration.class);
     log.info("The Application Configuration : {}", airConfiguration);
     AirApplication airApplication = new AirApplication(airConfiguration);
     long startTime = System.currentTimeMillis();
-    Arrays.asList(airConfiguration.getQuery().split(";"))
+    Arrays.asList(airConfiguration.getQuery().split(QUERY_SPLITTER))
         .forEach(
             query -> {
               try {
                 List<Map<String, Object>> results = airApplication.submitQuery(query);
                 log.info("Query result : {}", results);
               } catch (SQLException | JsonProcessingException e) {
-                log.error(
-                    "Failed due to {}", Throwables.getStackTraceAsString(e.fillInStackTrace()));
+                log.error("Failed due to {}", Throwables.getStackTraceAsString(e.fillInStackTrace()));
               }
             });
-    log.info(
-        "Final execution time for all queries in total : {}",
-        (System.currentTimeMillis() - startTime));
+    log.info("Final execution time for all queries in total : {}", (System.currentTimeMillis() - startTime));
   }
 
   /**
@@ -62,10 +60,7 @@ public class AirApplication {
    */
   public List<Map<String, Object>> submitQuery(String query)
       throws SQLException, JsonProcessingException {
-    return Strings.isNullOrEmpty(query)
-        ? new ArrayList<>()
-        : this.airQuerySubmitter.executeQuery(
-            String.format("%s option(timeoutMs=%d)", query, this.airConfiguration.getTimeoutMs()));
+    return Strings.isNullOrEmpty(query) ? new ArrayList<>() : this.airQuerySubmitter.executeQuery(String.format("%s option(timeoutMs=%d)", query, this.airConfiguration.getTimeoutMs()));
   }
 
   /**
@@ -75,9 +70,6 @@ public class AirApplication {
    */
   public List<Map<String, Object>> submitQuery(String query, long timeoutMs)
       throws SQLException, JsonProcessingException {
-    return Strings.isNullOrEmpty(query)
-        ? new ArrayList<>()
-        : this.airQuerySubmitter.executeQuery(
-            String.format("%s option(timeoutMs=%d)", query, timeoutMs));
+    return Strings.isNullOrEmpty(query) ? new ArrayList<>() : this.airQuerySubmitter.executeQuery(String.format("%s option(timeoutMs=%d)", query, timeoutMs));
   }
 }

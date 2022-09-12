@@ -17,4 +17,7 @@ public class Constants {
     public static final String HEADER_NAME = "headers.Accept";
     public static final String HEADER_VALUE = "application/json";
     public static final String HEADER_AUTH_NAME = "headers.Authorization";
+
+    // Query splitter
+    public static final String QUERY_SPLITTER = ";";
 }
