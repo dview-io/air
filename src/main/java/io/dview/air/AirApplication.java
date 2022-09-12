@@ -58,8 +58,7 @@ public class AirApplication {
    * @return List linked with {@link List}
    * @throws SQLException linked with {@link Exception}
    */
-  public List<Map<String, Object>> submitQuery(String query)
-      throws SQLException, JsonProcessingException {
+  public List<Map<String, Object>> submitQuery(String query) throws SQLException, JsonProcessingException {
     return Strings.isNullOrEmpty(query) ? new ArrayList<>() : this.airQuerySubmitter.executeQuery(String.format("%s option(timeoutMs=%d)", query, this.airConfiguration.getTimeoutMs()));
   }
 
@@ -68,8 +67,7 @@ public class AirApplication {
    * @return List linked with {@link List}
    * @throws SQLException linked with {@link Exception}
    */
-  public List<Map<String, Object>> submitQuery(String query, long timeoutMs)
-      throws SQLException, JsonProcessingException {
+  public List<Map<String, Object>> submitQuery(String query, long timeoutMs) throws SQLException, JsonProcessingException {
     return Strings.isNullOrEmpty(query) ? new ArrayList<>() : this.airQuerySubmitter.executeQuery(String.format("%s option(timeoutMs=%d)", query, timeoutMs));
   }
 }
