@@ -17,4 +17,7 @@ public class AirConfiguration {
     private String authToken;
     private int poolSize = 5;
     private String query;
+    private long timeoutMs = 10000;
+    private boolean enablePool = false;
+    private int defaultConnTimeout = 5000;
 }

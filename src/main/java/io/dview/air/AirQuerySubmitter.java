@@ -19,7 +19,7 @@ public class AirQuerySubmitter {
 
   public AirQuerySubmitter(AirConfiguration airConfiguration) throws SQLException {
     this.basicConnectionPool = BasicConnectionPool.create(airConfiguration.getEndPoint(),
-            airConfiguration.getAuthToken(), airConfiguration.getPoolSize());
+        airConfiguration.getAuthToken(), airConfiguration.getPoolSize(), airConfiguration.isEnablePool());
   }
 
   /**
@@ -28,6 +28,8 @@ public class AirQuerySubmitter {
    * @throws SQLException linked with {@link Exception}
    */
   public List<Map<String, Object>> executeQuery(final String query) throws SQLException, JsonProcessingException {
+    long startTime = System.currentTimeMillis();
+    log.info("Query to be submitted: {}", query);
     Connection pinotConnection = this.basicConnectionPool.getConnection();
     try (Statement statement = pinotConnection.createStatement(); ) {
       ResultSet rs = statement.executeQuery(query);
@@ -37,15 +39,16 @@ public class AirQuerySubmitter {
         Map<String, Object> entry = new HashMap<>();
         for (int i = 1; i <= col; ++i) {
           if (rs.getMetaData().getColumnTypeName(i).contains("ARRAY")) {
-            List<Object> objects = OBJECT_MAPPER.readValue(rs.getString(i), new TypeReference<List<Object>>() {});
+            List<Object> objects = OBJECT_MAPPER.readValue(rs.getString(i), new TypeReference<>() {});
             entry.put(rs.getMetaData().getColumnLabel(i), objects);
           }else if (rs.getMetaData().getColumnTypeName(i).contains("JSON")){
-            Map<String, Object> objects = OBJECT_MAPPER.readValue(rs.getString(i), new TypeReference<Map<String, Object>>() {});
+            Map<String, Object> objects = OBJECT_MAPPER.readValue(rs.getString(i), new TypeReference<>() {});
             entry.put(rs.getMetaData().getColumnLabel(i), objects);
           }else entry.put(rs.getMetaData().getColumnLabel(i), rs.getObject(i));
         }
         queryResult.add(entry);
       }
+      log.debug("Total query time : {}, for query {}", (System.currentTimeMillis() - startTime), query);
       return queryResult;
     } finally {
       this.basicConnectionPool.releaseConnection(pinotConnection);

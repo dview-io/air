@@ -15,7 +15,7 @@
         <slf4j-api>1.7.32</slf4j-api>
         <fasterxml>2.13.0</fasterxml>
         <commons-lang3>3.12.0</commons-lang3>
-        <pinot-jdbc-client>0.9.0</pinot-jdbc-client>
+        <pinot-jdbc-client>0.10.0</pinot-jdbc-client>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
     </properties>
