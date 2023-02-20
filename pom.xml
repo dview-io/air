@@ -13,7 +13,7 @@
         <lombok>1.18.22</lombok>
         <netty>4.0.0.Alpha8</netty>
         <slf4j-api>1.7.32</slf4j-api>
-        <fasterxml>2.13.0</fasterxml>
+        <fasterxml>2.14.2</fasterxml>
         <commons-lang3>3.12.0</commons-lang3>
         <pinot-jdbc-client>0.10.0</pinot-jdbc-client>
         <maven.compiler.source>11</maven.compiler.source>
@@ -130,16 +130,12 @@
                         </goals>
                         <configuration>
                             <transformers>
-                                <transformer
-                                        implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>reference.conf</resource>
                                 </transformer>
-                                <transformer
-                                        implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer"/>
-                                <transformer
-                                        implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
-                                <transformer
-                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer"/>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <mainClass>io.dview.air.AirApplication</mainClass>
                                 </transformer>
                             </transformers>
