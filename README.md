@@ -1,4 +1,4 @@
-Pinot Connection Polling and Resulting as list of Objects.
+**Pinot Connection Polling and Resulting as list of Objects.**
 
     - AirConfiguration
         - endPoint : 'jdbc:pinot://localhost:9000' { Connection End Point }

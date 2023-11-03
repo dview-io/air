@@ -1,8 +1,6 @@
 package io.dview.air;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * This {@code AirConfiguration} is responsible
@@ -10,8 +8,6 @@ import lombok.NoArgsConstructor;
  *
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class AirConfiguration {
     private String endPoint;
     private String authToken;

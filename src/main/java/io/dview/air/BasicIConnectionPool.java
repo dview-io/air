@@ -1,13 +1,13 @@
 package io.dview.air;
 
-import com.google.common.base.Strings;
-import java.util.concurrent.LinkedBlockingDeque;
 import lombok.extern.slf4j.Slf4j;
+import com.google.common.base.Strings;
 import org.apache.pinot.client.PinotDriver;
+import java.util.concurrent.LinkedBlockingDeque;
 
-import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Connection;
 import java.util.*;
 
 /**
@@ -15,29 +15,29 @@ import java.util.*;
  * call must take and return the connection.
  */
 @Slf4j
-public class BasicConnectionPool implements ConnectionPool {
+public class BasicIConnectionPool implements IConnectionPool {
 
   private final String endPoint;
   private final String authToken;
-  private final boolean enablePool;
+  private final boolean enableConnectionPool;
   private final LinkedBlockingDeque<Connection> connectionPool;
   private final LinkedBlockingDeque<Connection> usedConnections;
 
-  public BasicConnectionPool(String endPoint, String authToken, List<Connection> pool, boolean enablePool) {
+  public BasicIConnectionPool(String endPoint, String authToken, List<Connection> pool, boolean enableConnectionPool) {
     this.endPoint = endPoint;
     this.authToken = authToken;
     this.usedConnections = new LinkedBlockingDeque<>();
     this.connectionPool = new LinkedBlockingDeque<>(pool);
-    this.enablePool = enablePool;
+    this.enableConnectionPool = enableConnectionPool;
   }
 
-  public static BasicConnectionPool create(String endPoint, String authToken, int poolSize, boolean enablePool) throws SQLException {
+  public static BasicIConnectionPool create(String endPoint, String authToken, int poolSize, boolean enablePool) throws SQLException {
     DriverManager.registerDriver(new PinotDriver());
     LinkedList<Connection> pool = new LinkedList<>();
     //Create connections pool on enabled
     if (enablePool)
       for (int i = 0; i < poolSize; i++) { pool.add(createConnection(endPoint, authToken)); }
-    return new BasicConnectionPool(endPoint, authToken, pool, enablePool);
+    return new BasicIConnectionPool(endPoint, authToken, pool, enablePool);
   }
 
   /**
@@ -60,7 +60,7 @@ public class BasicConnectionPool implements ConnectionPool {
   @Override
   public Connection getConnection() throws SQLException {
     //Get new connection on every execution if pool is disabled.
-    if(!this.enablePool)
+    if(!this.enableConnectionPool)
       return createConnection(this.endPoint, this.authToken);
 
     if (this.connectionPool.isEmpty() && usedConnections.isEmpty()) {
@@ -89,7 +89,7 @@ public class BasicConnectionPool implements ConnectionPool {
   @Override
   public boolean releaseConnection(Connection connection) throws SQLException {
     // Close the connection if pooling is off.
-    if (!this.enablePool) {
+    if (!this.enableConnectionPool) {
       connection.close();
       return true;
     }
