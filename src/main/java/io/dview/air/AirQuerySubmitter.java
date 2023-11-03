@@ -15,10 +15,10 @@ import java.util.*;
  */
 @Slf4j
 public class AirQuerySubmitter {
-  private final BasicIConnectionPool basicConnectionPool;
+  private final AirConnectionPool airConnectionPool;
 
   public AirQuerySubmitter(AirConfiguration airConfiguration) throws SQLException {
-    this.basicConnectionPool = BasicIConnectionPool.create(airConfiguration.getEndPoint(),
+    this.airConnectionPool = AirConnectionPool.create(airConfiguration.getEndPoint(),
         airConfiguration.getAuthToken(), airConfiguration.getPoolSize(), airConfiguration.isEnablePool());
   }
 
@@ -30,7 +30,7 @@ public class AirQuerySubmitter {
   public List<Map<String, Object>> executeQuery(final String query) throws SQLException, JsonProcessingException {
     long startTime = System.currentTimeMillis();
     log.info("Query to be submitted: {}", query);
-    Connection pinotConnection = this.basicConnectionPool.getConnection();
+    Connection pinotConnection = this.airConnectionPool.getConnection();
     try (Statement statement = pinotConnection.createStatement()) {
       ResultSet rs = statement.executeQuery(query);
       int col = rs.getMetaData().getColumnCount();
@@ -49,7 +49,7 @@ public class AirQuerySubmitter {
       log.debug("Total query time : {}, for query {}", (System.currentTimeMillis() - startTime), query);
       return queryResult;
     } finally {
-      this.basicConnectionPool.releaseConnection(pinotConnection);
+      this.airConnectionPool.releaseConnection(pinotConnection);
     }
   }
 }

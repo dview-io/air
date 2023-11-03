@@ -15,7 +15,7 @@ import java.util.*;
  * call must take and return the connection.
  */
 @Slf4j
-public class BasicIConnectionPool implements IConnectionPool {
+public class AirConnectionPool implements IConnectionPool {
 
   private final String endPoint;
   private final String authToken;
@@ -23,7 +23,7 @@ public class BasicIConnectionPool implements IConnectionPool {
   private final LinkedBlockingDeque<Connection> connectionPool;
   private final LinkedBlockingDeque<Connection> usedConnections;
 
-  public BasicIConnectionPool(String endPoint, String authToken, List<Connection> pool, boolean enableConnectionPool) {
+  public AirConnectionPool(String endPoint, String authToken, List<Connection> pool, boolean enableConnectionPool) {
     this.endPoint = endPoint;
     this.authToken = authToken;
     this.usedConnections = new LinkedBlockingDeque<>();
@@ -31,13 +31,13 @@ public class BasicIConnectionPool implements IConnectionPool {
     this.enableConnectionPool = enableConnectionPool;
   }
 
-  public static BasicIConnectionPool create(String endPoint, String authToken, int poolSize, boolean enablePool) throws SQLException {
+  public static AirConnectionPool create(String endPoint, String authToken, int poolSize, boolean enablePool) throws SQLException {
     DriverManager.registerDriver(new PinotDriver());
     LinkedList<Connection> pool = new LinkedList<>();
     //Create connections pool on enabled
     if (enablePool)
       for (int i = 0; i < poolSize; i++) { pool.add(createConnection(endPoint, authToken)); }
-    return new BasicIConnectionPool(endPoint, authToken, pool, enablePool);
+    return new AirConnectionPool(endPoint, authToken, pool, enablePool);
   }
 
   /**
